@@ -95,13 +95,13 @@ function run() {
     if (rot < 180) {
       rot += 180
     }
-    draw.plain(d.label).center(...pos(radius + style.label_offset)).font(style.text_style.font).rotate(rot + 90)
+    draw.plain(d.label).font(style.text_style.font).center(...pos(radius + style.label_offset)).rotate(rot + 90)
 
     var step_size = (d.scale.end - d.scale.start) / d.steps
     for (var j=1; j<d.steps; j++) {
       var r = radius /d.steps * j
       var num = step_size * j + d.scale.start
-      draw.plain((num).toFixed(1)).center(Math.cos(a)*r + center.x, Math.sin(a)*r + center.y).font(style.text_style.font)
+      draw.plain((num).toFixed(1)).font(style.text_style.font).center(Math.cos(a)*r + center.x, Math.sin(a)*r + center.y)
     }
 
     var r = (d.value - d.scale.start) / (d.scale.end - d.scale.start) * radius
