@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.5/svg.min.js"></script> 
+  <body>
+    <textarea rows="20" cols="60" id='data'>
+[
+  { 
+    "label": "line",
+    "scale": {"start": 5, "end":10},
+    "value": 8,
+    "steps": 10
+  },
+  { 
+    "label": "line",
+    "scale": {"start": 5, "end":10},
+    "value": 8,
+    "steps": 10
+  },
+  { 
+    "label": "line",
+    "scale": {"start": 5, "end":10},
+    "value": 8,
+    "steps": 10
+  }
+]
+    </textarea>
+    <button onclick="run()">run</button> 
+    <div id="drawing"></div>
+    <script>
+function run() {
+  var stroke_style = {width:1, color:'#ccc'}
+  var radius = 400
+  var center = {x: (radius), y:(radius)}
+  var data = JSON.parse(document.getElementById("data").value)
+
+  document.getElementById("drawing").innerHTML = ''
+  var draw = SVG('drawing').size(radius*2+ 50, radius*2 + 50)
+  var circle = draw.circle(radius*2).center(center.x, center.y).fill('none').stroke(stroke_style)
+  var points = []
+
+
+  // already make the polygon so it is in the background
+  var polygon = draw.polygon([])
+
+  for (var i=0; i< data.length; i++) {
+    var d = data[i]
+    var a = Math.PI/data.length*i*2
+    var pos = [Math.cos(a)*radius+center.x, Math.sin(a)*radius + center.y]
+
+    draw.line(center.x, center.y, ...pos).stroke(stroke_style)
+    draw.text(d.label).center(...pos)
+
+    var step_size = (d.scale.end - d.scale.start) / d.steps
+    for (var j=1; j<d.steps; j++) {
+      var r = radius /d.steps * j
+      var num = step_size * j + d.scale.start
+      draw.text((num).toFixed(1)).center(Math.cos(a)*r + center.x, Math.sin(a)*r + center.y)
+    }
+
+    var r = (d.value - d.scale.start) / (d.scale.end - d.scale.start) * radius
+    points[i] = [Math.cos(a) * r + center.x, Math.sin(a) * r + center.y] 
+  }
+
+  console.log([].concat(...points))
+  polygon.plot([].concat(...points)).stroke('none').fill(stroke_style).opacity(0.5)
+}
+
+    </script>
+  </body>
+</html> 
