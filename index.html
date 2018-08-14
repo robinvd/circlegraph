@@ -33,18 +33,33 @@
   }
 ]
     </textarea>
+    <textarea rows="20" cols="60" id='style'>
+{ 
+  "stroke_style": {"width": 1, "color": "#ccc"},
+  "area_style": {"color": "#ccc", "opacity": 0.5},
+  "text_style": {
+    "font": {
+      "family":   "Helvetica",
+      "size":     10,
+      "anchor":   "middle",
+      "leading":  "1.5em"
+    }
+  }
+}
+    </textarea>
     <button onclick="run()">run</button> 
     <div id="drawing"></div>
     <script>
 function run() {
-  var stroke_style = {width:1, color:'#ccc'}
+  // var stroke_style = {width:1, color:'#ccc'}
   var radius = 400
   var center = {x: (radius), y:(radius)}
   var data = JSON.parse(document.getElementById("data").value)
+  var style = JSON.parse(document.getElementById("style").value)
 
   document.getElementById("drawing").innerHTML = ''
   var draw = SVG('drawing').size(radius*2+ 50, radius*2 + 50)
-  var circle = draw.circle(radius*2).center(center.x, center.y).fill('none').stroke(stroke_style)
+  var circle = draw.circle(radius*2).center(center.x, center.y).fill('none').stroke(style.stroke_style)
   var points = []
 
 
@@ -56,22 +71,21 @@ function run() {
     var a = Math.PI/data.length*i*2
     var pos = [Math.cos(a)*radius+center.x, Math.sin(a)*radius + center.y]
 
-    draw.line(center.x, center.y, ...pos).stroke(stroke_style)
-    draw.text(d.label).center(...pos)
+    draw.line(center.x, center.y, ...pos).stroke(style.stroke_style)
+    draw.text(d.label).center(...pos).font(style.text_style.font)
 
     var step_size = (d.scale.end - d.scale.start) / d.steps
     for (var j=1; j<d.steps; j++) {
       var r = radius /d.steps * j
       var num = step_size * j + d.scale.start
-      draw.text((num).toFixed(1)).center(Math.cos(a)*r + center.x, Math.sin(a)*r + center.y)
+      draw.text((num).toFixed(1)).center(Math.cos(a)*r + center.x, Math.sin(a)*r + center.y).font(style.text_style.font)
     }
 
     var r = (d.value - d.scale.start) / (d.scale.end - d.scale.start) * radius
     points[i] = [Math.cos(a) * r + center.x, Math.sin(a) * r + center.y] 
   }
 
-  console.log([].concat(...points))
-  polygon.plot([].concat(...points)).stroke('none').fill(stroke_style).opacity(0.5)
+  polygon.plot([].concat(...points)).stroke('none').fill(style.area_style.color).opacity(style.area_style.opacity)
 }
 
     </script>
