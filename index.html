@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <html>
+  <meta charset="UTF-8"> 
   <head>
     <style>
       body {
@@ -9,20 +10,32 @@
     </style>
   </head>
   
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.5/svg.min.js"></script> 
+   <script src="svg.min.js"></script> 
   <body>
     <textarea rows="20" cols="60" id='data'>
 [
   { 
-    "label": "basic",
+    "label": "basic1",
+    "scale": {"start": 2, "end":10},
+    "value": 5.5,
+    "steps": 10
+  },
+  { 
+    "label": "basic2",
     "scale": {"start": 5, "end":10},
     "value": 8,
     "steps": 10
   },
   { 
+    "label": "basic3",
+    "scale": {"start": 0, "end":10},
+    "value": 10,
+    "steps": 10
+  },
+  { 
     "label": "more steps",
     "scale": {"start": 0, "end":10},
-    "value": 2,
+    "value": 5,
     "steps": 15
   },
   { 
@@ -35,16 +48,17 @@
     </textarea>
     <textarea rows="20" cols="60" id='style'>
 { 
-  "stroke_style": {"width": 1, "color": "#ccc"},
-  "area_style": {"color": "#ccc", "opacity": 0.5},
+  "stroke_style": {"width": 1, "color": "#2c3e50"},
+  "area_style": {"color": "#f44336", "opacity": 1},
+  "circle_style": {"width": 1,"color": "#03A9F4"},
   "text_style": {
     "font": {
       "family":   "Helvetica",
-      "size":     10,
-      "anchor":   "middle",
-      "leading":  "1.5em"
+      "size":     20,
+      "anchor":   "start"
     }
-  }
+  },
+  "label_offset": 25
 }
     </textarea>
     <button onclick="run()">run</button> 
@@ -53,15 +67,16 @@
 function run() {
   // var stroke_style = {width:1, color:'#ccc'}
   var radius = 400
-  var center = {x: (radius), y:(radius)}
+  var padding = 50
+  var center = {x: (radius) + padding, y:(radius) + padding}
   var data = JSON.parse(document.getElementById("data").value)
   var style = JSON.parse(document.getElementById("style").value)
 
   document.getElementById("drawing").innerHTML = ''
-  var draw = SVG('drawing').size(radius*2+ 50, radius*2 + 50)
-  var circle = draw.circle(radius*2).center(center.x, center.y).fill('none').stroke(style.stroke_style)
-  var points = []
+  var draw = SVG('drawing').size(radius*2 + padding*2, radius*2 + padding*2)
 
+  var circle = draw.circle(radius*2).center(center.x, center.y).fill(style.circle_style)// .stroke(style.circle_style)
+  var points = []
 
   // already make the polygon so it is in the background
   var polygon = draw.polygon([])
@@ -69,25 +84,32 @@ function run() {
   for (var i=0; i< data.length; i++) {
     var d = data[i]
     var a = Math.PI/data.length*i*2
-    var pos = [Math.cos(a)*radius+center.x, Math.sin(a)*radius + center.y]
+    var pos = r => [Math.cos(a)*r + center.x, Math.sin(a)*r + center.y]
 
-    draw.line(center.x, center.y, ...pos).stroke(style.stroke_style)
-    draw.text(d.label).center(...pos).font(style.text_style.font)
+    draw.line(center.x, center.y, ...pos(radius)).stroke(style.stroke_style)
+
+    var rot = a*180/Math.PI
+    if (rot < 180) {
+      rot += 180
+    }
+    draw.plain(d.label).center(...pos(radius + style.label_offset)).font(style.text_style.font).rotate(rot + 90)
 
     var step_size = (d.scale.end - d.scale.start) / d.steps
     for (var j=1; j<d.steps; j++) {
       var r = radius /d.steps * j
       var num = step_size * j + d.scale.start
-      draw.text((num).toFixed(1)).center(Math.cos(a)*r + center.x, Math.sin(a)*r + center.y).font(style.text_style.font)
+      draw.plain((num).toFixed(1)).center(Math.cos(a)*r + center.x, Math.sin(a)*r + center.y).font(style.text_style.font)
     }
 
     var r = (d.value - d.scale.start) / (d.scale.end - d.scale.start) * radius
-    points[i] = [Math.cos(a) * r + center.x, Math.sin(a) * r + center.y] 
+    points[i] = pos(r)
   }
 
   polygon.plot([].concat(...points)).stroke('none').fill(style.area_style.color).opacity(style.area_style.opacity)
 }
 
+
+run()
     </script>
   </body>
 </html> 
