@@ -61,6 +61,9 @@
   "label_offset": 25
 }
     </textarea>
+    <textarea rows="20" cols="60" id='output'>
+      sgv output
+    </textarea>
     <button onclick="run()">run</button> 
     <div id="drawing"></div>
     <script>
@@ -106,6 +109,8 @@ function run() {
   }
 
   polygon.plot([].concat(...points)).stroke('none').fill(style.area_style.color).opacity(style.area_style.opacity)
+
+  document.getElementById("output").value = draw.svg()
 }
 
 
