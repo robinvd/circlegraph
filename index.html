@@ -58,7 +58,8 @@
       "anchor":   "start"
     }
   },
-  "label_offset": 25
+  "label_offset": 25,
+  "animate": 1000
 }
     </textarea>
     <textarea rows="20" cols="60" id='output'>
@@ -68,7 +69,6 @@
     <div id="drawing"></div>
     <script>
 function run() {
-  // var stroke_style = {width:1, color:'#ccc'}
   var radius = 400
   var padding = 50
   var center = {x: (radius) + padding, y:(radius) + padding}
@@ -108,7 +108,11 @@ function run() {
     points[i] = pos(r)
   }
 
-  polygon.plot([].concat(...points)).stroke('none').fill(style.area_style.color).opacity(style.area_style.opacity)
+  polygon = polygon.center(center.x, center.y).fill(style.area_style.color).opacity(style.area_style.opacity).stroke('none')
+  if (style.animate > 0) {
+    polygon = polygon.animate(style.animate)
+  }
+  polygon.plot([].concat(...points))
 
   document.getElementById("output").value = draw.svg()
 }
