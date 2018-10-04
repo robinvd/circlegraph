@@ -5,6 +5,11 @@ function run() {
   var raw_data = document.getElementById("data").value
   var data
   if (document.getElementById("use_csv").checked) {
+    if (document.getElementById("dutch_mode").checked) {
+        raw_data = raw_data.split(",").join(".")
+        raw_data = raw_data.split(";").join(",")
+        console.log(raw_data)
+    }
     var result = Papa.parse(raw_data, {header: true, dynamicTyping: true})
     if (result.errors > 1) {
         document.getElementById("output").value = result.errors
